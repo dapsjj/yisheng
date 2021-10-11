@@ -9,7 +9,7 @@ from math import sqrt
 import os
 import psycopg2
 import schedule
-from datetime import datetime
+import datetime
 
 #颜色是http://www.nmc.cn/publish/sea/seaplatform1.html图例,RGB顺序的值
 COLORS = [
@@ -68,7 +68,8 @@ def closest_color(rgb):
 
 
 def outputVisibilityValue():
-    now_time = datetime.today().strftime('%Y-%m-%d %H')
+    # now_time = datetime.today().strftime('%Y-%m-%d %H')
+    now_time = (datetime.datetime.now() - datetime.timedelta(hours=1)).strftime('%Y-%m-%d %H') #获取前一个小时
     now_time_image = os.path.join(images_folder, now_time + '.jpg')
     if os.path.exists(now_time_image):
         # title = [['date', 'visibility', 'label']]
@@ -114,7 +115,7 @@ def outputVisibilityValue():
 if __name__=='__main__':
     images_folder = r'/home/images'
     # schedule.every().hour.do(outputVisibilityValue)
-    schedule.every(10).minutes.do(outputVisibilityValue)
+    schedule.every(60).minutes.do(outputVisibilityValue)
     while True:
         schedule.run_pending()
 
