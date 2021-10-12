@@ -8,6 +8,7 @@ from flask import url_for
 from flask import request
 import os
 import json
+import datetime
 
 app = Flask(__name__)
 
@@ -27,13 +28,16 @@ app = Flask(__name__)
 @app.route('/detectForCar', methods=['GET','POST'])
 def detectForCar():
     source = request.args.get("source")
+    ip = request.remote_addr #获取访问的ip
+    now_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print('ip:'+ip,'now:'+now_time)
     print('source:' + source)
     if source:
         if os.path.exists(source):
             try:
-                cmd = 'python detect_for_all_plate_统计各种车的数量和车牌号.py --source %s' %source
-                print('cmd:'+ cmd)
-                os.system(cmd)
+                # cmd = 'python detect_for_all_plate_统计各种车的数量和车牌号.py --source %s' %source
+                # print('cmd:'+ cmd)
+                # os.system(cmd)
                 str_response = {'message': '请求成功'}
                 json_response = json.dumps(str_response,ensure_ascii=False)
                 return json_response
