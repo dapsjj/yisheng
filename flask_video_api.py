@@ -2,13 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask
-from flask import render_template
-from flask import redirect
-from flask import url_for
 from flask import request
 import os
 import json
 import datetime
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
 
@@ -20,6 +19,9 @@ app = Flask(__name__)
 #图片文件夹
 # http://192.168.1.186:8081/detectForCar?source=D:/pythonProjects/yolov5-master/data/images
 
+# 该配置为全局配置、适用于所有接口
+limiter = Limiter(app, key_func=get_remote_address, default_limits=["1/5minute"])
+
 
 @app.route('/')
 # def index():
@@ -27,16 +29,19 @@ app = Flask(__name__)
 
 @app.route('/detectForCar', methods=['GET','POST'])
 def detectForCar():
+    global count
     source = request.args.get("source")
     ip = request.remote_addr #获取访问的ip
     now_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print('ip:'+ip,'now:'+now_time)
     print('source:' + source)
+    count += 1
+    print('请求次数:',count)
     if source:
         if os.path.exists(source):
             try:
-                # cmd = 'python detect_for_all_plate_统计各种车的数量和车牌号.py --source %s' %source
-                # print('cmd:'+ cmd)
+                cmd = 'python detect_for_all_plate_统计各种车的数量和车牌号.py --source %s' %source
+                print('cmd:'+ cmd)
                 # os.system(cmd)
                 str_response = {'message': '请求成功'}
                 json_response = json.dumps(str_response,ensure_ascii=False)
@@ -56,6 +61,7 @@ def detectForCar():
 
 
 if __name__ == '__main__':
+    count = 0
     app.run(host='192.168.1.186' ,port=8081)
 
 
